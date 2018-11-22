@@ -2,7 +2,7 @@ extern crate serde;
 #[macro_use] extern crate serde_derive;
 extern crate serde_json;
 
-use std::io::{BufReader, BufRead, BufWriter, Lines, Write};
+use std::io::{BufReader, BufRead, BufWriter, Write};
 use std::fs::{File};
 use std::iter::{Iterator};
 use std::time::Instant;
@@ -32,7 +32,7 @@ fn main() -> Result<(), Box<std::error::Error>> {
     let mut writer = BufWriter::with_capacity(32 * 2usize.pow(20), output); // 32MB buffered
 
     let mut lines = reader.lines().into_iter();
-    let record = _convert(&mut lines);
+    let record = serde_json::from_str::<Vec<Point>>(&lines.next().unwrap().unwrap()).unwrap();
     let n = 5; // number of interested point to take
     let mut ref_points = record;
 
@@ -41,9 +41,6 @@ fn main() -> Result<(), Box<std::error::Error>> {
         let moved_points = record;
         let distances = _eucl_distance_str(&ref_points[0..n], &moved_points[0..n])?;
         ref_points = moved_points;
-
-        // it prints float only in 8 precision while python print in 15
-        // writer.write(serde_json::to_vec(&distances)?.as_slice())?;
         
         writer.write(b"[")?;
         writer.write(distances.join(", ").as_bytes())?;
@@ -52,10 +49,6 @@ fn main() -> Result<(), Box<std::error::Error>> {
 
     println!("Done in {:?}", timer.elapsed());
     Ok(())
-}
-
-fn _convert(lines : &mut Lines<BufReader<File>>) -> Vec<Point> {
-    serde_json::from_str::<Vec<Point>>(&lines.next().unwrap().unwrap()).unwrap()
 }
 
 fn _eucl_distance_str(lhs : &[Point], rhs : &[Point]) -> Result<Vec<String>, &'static str> {
