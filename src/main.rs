@@ -58,14 +58,6 @@ fn _convert(lines : &mut Lines<BufReader<File>>) -> Vec<Point> {
     serde_json::from_str::<Vec<Point>>(&lines.next().unwrap().unwrap()).unwrap()
 }
 
-fn _eucl_distance(lhs : &[Point], rhs : &[Point]) -> Result<Vec<f32>, &'static str> {
-    if lhs.len() != rhs.len() {
-        return Err("lhs and rhs have different length");
-    }
-
-    Ok(lhs.iter().enumerate().map(|(i, left)| {left.eucl_dist(rhs[i])}).collect())
-}
-
 fn _eucl_distance_str(lhs : &[Point], rhs : &[Point]) -> Result<Vec<String>, &'static str> {
     if lhs.len() != rhs.len() {
         return Err("lhs and rhs have different length");
