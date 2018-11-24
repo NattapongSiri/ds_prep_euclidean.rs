@@ -12,13 +12,13 @@ struct Point (i32, i32, i32);
 
 impl Point {
     /// Euclidean distance between 2 points
-    fn eucl_dist(&self, rhs : Self) -> f32 {
+    fn eucl_dist(&self, rhs : Self) -> f64 {
         (
             (
                 (self.0 - rhs.0).pow(2) +
                 (self.1 - rhs.1).pow(2) +
                 (self.2 - rhs.2).pow(2)
-            ) as f32
+            ) as f64
         ).sqrt()
     }
 }
