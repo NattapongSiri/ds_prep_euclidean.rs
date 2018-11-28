@@ -10,6 +10,9 @@ use std::time::Instant;
 #[derive(Clone, Copy, Deserialize, Serialize)]
 struct Point (i32, i32, i32);
 
+#[derive(Clone, Copy, Deserialize, Serialize)]
+struct FPoint (f64, f64, f64);
+
 impl Point {
     /// Euclidean distance between 2 points
     fn eucl_dist(&self, rhs : Self) -> f64 {
@@ -18,6 +21,19 @@ impl Point {
                 (self.0 - rhs.0).pow(2) +
                 (self.1 - rhs.1).pow(2) +
                 (self.2 - rhs.2).pow(2)
+            ) as f64
+        ).sqrt()
+    }
+}
+
+impl FPoint {
+    /// Euclidean distance between 2 points
+    fn eucl_dist(&self, rhs : Self) -> f64 {
+        (
+            (
+                (self.0 - rhs.0).powf(2f64) +
+                (self.1 - rhs.1).powf(2f64) +
+                (self.2 - rhs.2).powf(2f64)
             ) as f64
         ).sqrt()
     }
@@ -32,12 +48,12 @@ fn main() -> Result<(), Box<std::error::Error>> {
     let mut writer = BufWriter::with_capacity(32 * 2usize.pow(20), output); // 32MB buffered
 
     let mut lines = reader.lines().into_iter();
-    let record = serde_json::from_str::<Vec<Point>>(&lines.next().unwrap().unwrap()).unwrap();
+    let record = serde_json::from_str::<Vec<FPoint>>(&lines.next().unwrap().unwrap()).unwrap();
     let n = 5; // number of interested point to take
     let mut ref_points = record;
 
     for line in lines {
-        let record = serde_json::from_str::<Vec<Point>>(&line.unwrap())?;
+        let record = serde_json::from_str::<Vec<FPoint>>(&line.unwrap())?;
         let moved_points = record;
         let distances = _eucl_distance_str(&ref_points[0..n], &moved_points[0..n])?;
         ref_points = moved_points;
@@ -51,7 +67,7 @@ fn main() -> Result<(), Box<std::error::Error>> {
     Ok(())
 }
 
-fn _eucl_distance_str(lhs : &[Point], rhs : &[Point]) -> Result<Vec<String>, &'static str> {
+fn _eucl_distance_str(lhs : &[FPoint], rhs : &[FPoint]) -> Result<Vec<String>, &'static str> {
     if lhs.len() != rhs.len() {
         return Err("lhs and rhs have different length");
     }
